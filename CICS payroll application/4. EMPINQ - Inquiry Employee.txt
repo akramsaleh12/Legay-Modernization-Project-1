@@ -1,0 +1,65 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. EMPINQ.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       EXEC SQL INCLUDE SQLCA END-EXEC.
+
+       COPY MAINSET.
+
+       LINKAGE SECTION.
+       COPY DFHCOMMAREA.
+
+       PROCEDURE DIVISION USING DFHCOMMAREA.
+
+       EXEC CICS SEND MAP('INQMAP')
+                     MAPSET('MAINSET')
+                     ERASE
+       END-EXEC.
+
+       EXEC CICS RECEIVE MAP('INQMAP')
+                       MAPSET('MAINSET')
+       END-EXEC.
+
+       MOVE IEMPNI TO CA-EMP-NUM.
+
+       EXEC SQL
+           SELECT emp_name,
+                  emp_basic_salary,
+                  housing_allowance,
+                  transportation_allowance,
+                  tax,
+                  insurance,
+                  tot_income,
+                  tot_deductions,
+                  net_salary,
+                  date
+           INTO :CA-EMP-NAME,
+                :CA-BASIC-SAL,
+                :CA-HOUSING-ALLOW,
+                :CA-TRANSPORT-ALLOW,
+                :CA-TAX,
+                :CA-INSURANCE,
+                :CA-TOT-INCOME,
+                :CA-TOT-DEDUCTIONS,
+                :CA-NET-SALARY,
+                :CA-DATE
+           FROM employee_table
+           WHERE emp_num = :CA-EMP-NUM
+       END-EXEC.
+
+       IF SQLCODE = 100
+           MOVE 'NOT FOUND' TO IRESULT
+       ELSE
+           STRING
+             'NAME:' CA-EMP-NAME ' '
+             'NET:' CA-NET-SALARY
+           INTO IRESULT
+       END-IF.
+
+       EXEC CICS SEND MAP('INQMAP')
+                     MAPSET('MAINSET')
+                     CURSOR
+       END-EXEC.
+
+       EXEC CICS RETURN END-EXEC.

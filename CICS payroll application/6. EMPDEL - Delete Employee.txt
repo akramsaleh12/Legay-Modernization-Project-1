@@ -1,0 +1,42 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. EMPDEL.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       EXEC SQL INCLUDE SQLCA END-EXEC.
+
+       COPY MAINSET.
+
+       LINKAGE SECTION.
+       COPY DFHCOMMAREA.
+
+       PROCEDURE DIVISION USING DFHCOMMAREA.
+
+       EXEC CICS SEND MAP('DELMAP')
+                     MAPSET('MAINSET')
+                     ERASE
+       END-EXEC.
+
+       EXEC CICS RECEIVE MAP('DELMAP')
+                       MAPSET('MAINSET')
+       END-EXEC.
+
+       MOVE DEMPNI TO CA-EMP-NUM.
+
+       EXEC SQL
+           DELETE FROM employee_table
+           WHERE emp_num = :CA-EMP-NUM
+       END-EXEC.
+
+       IF SQLCODE = 100
+           MOVE 'NOT FOUND' TO DELMSG
+       ELSE
+           MOVE 'DELETED' TO DELMSG
+       END-IF.
+
+       EXEC CICS SEND MAP('DELMAP')
+                     MAPSET('MAINSET')
+                     CURSOR
+       END-EXEC.
+
+       EXEC CICS RETURN END-EXEC.

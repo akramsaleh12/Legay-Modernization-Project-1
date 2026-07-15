@@ -1,0 +1,13 @@
+CREATE TABLE employee_table (
+    emp_num                 INTEGER       NOT NULL PRIMARY KEY,
+    emp_name                VARCHAR(100)  NOT NULL,
+    emp_basic_salary        DECIMAL(10,2) NOT NULL,
+    housing_allowance       DECIMAL(10,2) NOT NULL,
+    transportation_allowance DECIMAL(10,2) NOT NULL,
+    tax                     DECIMAL(10,2) NOT NULL,
+    insurance               DECIMAL(10,2) NOT NULL,
+    tot_income              DECIMAL(10,2) NOT NULL,
+    tot_deductions          DECIMAL(10,2) NOT NULL,
+    net_salary              DECIMAL(10,2) NOT NULL,
+    date                    DATE          NOT NULL
+);

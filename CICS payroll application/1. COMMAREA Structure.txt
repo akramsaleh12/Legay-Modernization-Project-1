@@ -1,0 +1,13 @@
+       01 DFHCOMMAREA.
+          05 CA-OPTION            PIC X.
+          05 CA-EMP-NUM           PIC 9(9).
+          05 CA-EMP-NAME          PIC X(100).
+          05 CA-BASIC-SAL         PIC S9(9)V99 COMP-3.
+          05 CA-HOUSING-ALLOW     PIC S9(9)V99 COMP-3.
+          05 CA-TRANSPORT-ALLOW   PIC S9(9)V99 COMP-3.
+          05 CA-TAX               PIC S9(9)V99 COMP-3.
+          05 CA-INSURANCE         PIC S9(9)V99 COMP-3.
+          05 CA-TOT-INCOME        PIC S9(9)V99 COMP-3.
+          05 CA-TOT-DEDUCTIONS    PIC S9(9)V99 COMP-3.
+          05 CA-NET-SALARY        PIC S9(9)V99 COMP-3.
+          05 CA-DATE              PIC X(10).

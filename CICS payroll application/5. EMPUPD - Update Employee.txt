@@ -1,0 +1,70 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. EMPUPD.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       EXEC SQL INCLUDE SQLCA END-EXEC.
+
+       COPY MAINSET.
+
+       LINKAGE SECTION.
+       COPY DFHCOMMAREA.
+
+       PROCEDURE DIVISION USING DFHCOMMAREA.
+
+       EXEC CICS SEND MAP('UPDMAP')
+                     MAPSET('MAINSET')
+                     ERASE
+       END-EXEC.
+
+       EXEC CICS RECEIVE MAP('UPDMAP')
+                       MAPSET('MAINSET')
+       END-EXEC.
+
+       MOVE UEMPNI  TO CA-EMP-NUM.
+       MOVE UEMPNMI TO CA-EMP-NAME.
+       MOVE UBASICI TO CA-BASIC-SAL.
+       MOVE UHOUI   TO CA-HOUSING-ALLOW.
+       MOVE UTRANI  TO CA-TRANSPORT-ALLOW.
+       MOVE UTAXI   TO CA-TAX.
+       MOVE UINSURI TO CA-INSURANCE.
+
+       COMPUTE CA-TOT-INCOME =
+               CA-BASIC-SAL
+             + CA-HOUSING-ALLOW
+             + CA-TRANSPORT-ALLOW.
+
+       COMPUTE CA-TOT-DEDUCTIONS =
+               CA-TAX
+             + CA-INSURANCE.
+
+       COMPUTE CA-NET-SALARY =
+               CA-TOT-INCOME
+             - CA-TOT-DEDUCTIONS.
+
+       EXEC SQL
+           UPDATE employee_table
+           SET emp_name                = :CA-EMP-NAME,
+               emp_basic_salary        = :CA-BASIC-SAL,
+               housing_allowance       = :CA-HOUSING-ALLOW,
+               transportation_allowance= :CA-TRANSPORT-ALLOW,
+               tax                     = :CA-TAX,
+               insurance               = :CA-INSURANCE,
+               tot_income              = :CA-TOT-INCOME,
+               tot_deductions          = :CA-TOT-DEDUCTIONS,
+               net_salary              = :CA-NET-SALARY
+           WHERE emp_num = :CA-EMP-NUM
+       END-EXEC.
+
+       IF SQLCODE = 100
+           MOVE 'NOT FOUND' TO UUPDMSG
+       ELSE
+           MOVE 'UPDATED' TO UUPDMSG
+       END-IF.
+
+       EXEC CICS SEND MAP('UPDMAP')
+                     MAPSET('MAINSET')
+                     CURSOR
+       END-EXEC.
+
+       EXEC CICS RETURN END-EXEC.
